@@ -21,8 +21,8 @@ export const ui = {
 		"hero.title.main": "We build open-source software to tackle",
 		"hero.title.1": "Spyware",
 		"hero.title.2": "Malware",
-		"hero.title.3": "Survellience",
-		"hero.title.4": "Surveillance",
+		"hero.title.3": "Surveillance",
+		"hero.title.4": "Censorship",
 		"hero.subtitle":
 			"We are a grassroots security research team. A collective of hacktivists, security researchers, technologists & incident responders working at the intersection of technology and human rights",
 		"hero.scroll": "scroll down to explore more",
