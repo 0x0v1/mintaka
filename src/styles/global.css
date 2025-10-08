@@ -22,7 +22,7 @@
 
 :root {
 	--astro-code-color-text: #ffffff;
-	--astro-code-color-background: #131313;
+	--astro-code-color-background: #040404;
 	--astro-code-token-constant: #8b919b;
 	--astro-code-token-string: #ffffff;
 	--astro-code-token-comment: #8b919b;
@@ -46,7 +46,8 @@
 
 html {
 	scrollbar-gutter: stable;
-	@apply overflow-x-hidden bg-slate-100 text-stone-900;
+	@apply overflow-x-hidden bg-slate-100;
+	color: #040404;
 }
 
 /* Custom scrollbar */
@@ -60,7 +61,7 @@ html {
 	background-color: transparent;
 }
 ::-webkit-scrollbar-thumb {
-	background-color: #1b1816;
+	background-color: #040404;
 	border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
@@ -77,18 +78,18 @@ html {
 
 ::-moz-selection {
 	color: white;
-	background: orange;
+	background: rgb(49, 48, 46);
 }
 ::selection {
 	color: white;
-	background: orange;
+	background: rgb(58, 57, 55);
 }
 .dark ::-moz-selection {
-	color: orange;
+	color: rgb(31, 30, 28);
 	background: white;
 }
 .dark ::selection {
-	color: orange;
+	color: rgb(27, 26, 24);
 	background: white;
 }
 
@@ -117,7 +118,7 @@ html {
 
 .squircle {
 	--squircle-smooth: 1;
-	--squircle-radius: 10px;
+	--squircle-radius: 0px;
 	border-radius: var(--squircle-radius);
 	mask-image: paint(squircle);
 }
@@ -125,7 +126,7 @@ html {
 .squircle-bg {
 	--squircle-smooth: 1;
 	--squircle-radius: 10px;
-	background: #272521;
+	background: #040404;
 	mask-image: paint(squircle);
 }
 

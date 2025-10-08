@@ -14,41 +14,18 @@ const translatePath = useTranslatedPath(lang);
 	</div>
 	<div class="mx-auto">
 		<Title class="pb-10 pt-20 uppercase" title={t("contact.title")} subtitle={t("contact.subtitle")} />
-		<form data-static-form-name="contact" class="mx-auto max-w-2xl pt-12 lg:pt-20">
-			<div class="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
-				<div class="form-field sm:col-span-2">
-					<label for="name" class="form-label">{t("contact.name")}*</label>
-					<input type="text" name="name" id="name" autocomplete="given-name" required />
-				</div>
-				<div class="form-field sm:col-span-2">
-					<label for="email" class="form-label">{t("contact.email")}*</label>
-					<input type="email" name="email" id="email" autocomplete="email" required />
-				</div>
-				<div class="form-field sm:col-span-2">
-					<label for="company" class="form-label">{t("contact.company")}</label>
-					<input type="text" name="company" id="company" autocomplete="organization" />
-				</div>
-				<div class="form-field sm:col-span-2">
-					<label for="message" class="form-label">{t("contact.message")}*</label>
-					<textarea name="message" id="message" rows="4" required></textarea>
-				</div>
-				<div class="flex gap-x-4 sm:col-span-2">
-					<label class="text-sm leading-6 text-gray-600" id="switch-1-label">
-						{t("contact.agree")}
-						<a href="/privacy" class="font-semibold text-slate-800">privacy policy</a>.
-					</label>
-				</div>
+		<div class="mx-auto max-w-2xl pt-12 lg:pt-20 text-center">
+			<div class="bg-slate-100 rounded-lg p-8 border border-slate-200">
+				<h3 class="text-2xl font-semibold text-gray-900 mb-4">Get in Touch</h3>
+				<p class="text-lg text-gray-600 mb-6">Please contact us at:</p>
+				<a
+					href="mailto:info@barghest.asia"
+					class="inline-block text-3xl font-bold text-black hover:text-gray-800 transition-colors duration-200 underline decoration-2 underline-offset-4"
+				>
+					info@barghest.asia
+				</a>
 			</div>
-			<div class="flex pt-10">
-				<div class="squircle-bg rounded-lg bg-zinc-900">
-					<button
-						type="submit"
-						class="flex h-10 w-full max-w-52 flex-1 items-center justify-center px-4 py-2 text-xl text-slate-200 transition-all hover:text-white sm:w-auto md:font-bold lg:h-10">
-						{t("contact.send")}
-					</button>
-				</div>
-			</div>
-		</form>
+		</div>
 	</div>
 </section>
 
@@ -75,16 +52,5 @@ const translatePath = useTranslatedPath(lang);
 		);
 	}
 
-	.form-field {
-		@apply block;
-	}
 
-	.form-label {
-		@apply flex pl-1 text-sm font-semibold leading-6 text-gray-900;
-	}
-
-	input,
-	textarea {
-		@apply pointer-events-auto relative m-0 w-full cursor-text rounded-lg border-0 bg-slate-200 px-5 py-2 text-xl font-normal not-italic outline-none placeholder:text-gray-400 focus:ring-slate-500;
-	}
 </style>
