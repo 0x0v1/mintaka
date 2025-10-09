@@ -1,5 +1,4 @@
 ---
-import Newsletter from "@components/blog/Newsletter.astro";
 import { getLangFromUrl, useTranslatedPath, useTranslations } from "@i18n/utils";
 import { Icon } from "astro-icon/components";
 
@@ -33,12 +32,7 @@ const translatePath = useTranslatedPath(lang);
 				</div>
 			</div>
 		</div>
-		<div class="col-span-6 row-start-1 text-5xl leading-tight lg:col-span-4 lg:row-start-auto lg:text-6xl">
-			<!-- Newsletter Section -->
-			<div>{t("footer.newsletter")}</div>
-			<div>{t("footer.newsletter2")}</div>
-			<Newsletter />
-		</div>
+
 	</div>
 	<div class="relative mt-4 flex w-full items-end justify-between gap-y-4 text-sm lg:text-xl lg:font-normal">
 		<div>CC0 No Rights Reserved</div>

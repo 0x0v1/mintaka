@@ -83,9 +83,6 @@ export const ui = {
 		"blog.title": "Blog",
 		"blog.subtitle": "Musings from the umbra",
 		"blog.gotoproject": "Go to project",
-		"footer.newsletter": "Subscribe to",
-		"footer.newsletter2": "our newsletter",
-		"footer.yourmail": "Your email",
 	},
 	cn: {
 		or: "o",
@@ -167,9 +164,6 @@ export const ui = {
 		"blog.title": "Blog",
 		"blog.subtitle": "Tecnologia, consigli e refusi!",
 		"blog.gotoproject": "Vai al progetto",
-		"footer.newsletter": "Iscriviti alla",
-		"footer.newsletter2": "newsletter",
-		"footer.yourmail": "La tua email",
 	},
 } as const;
 
