@@ -118,7 +118,7 @@ html {
 
 .squircle {
 	--squircle-smooth: 1;
-	--squircle-radius: 0px;
+	--squircle-radius: 10px;
 	border-radius: var(--squircle-radius);
 	mask-image: paint(squircle);
 }

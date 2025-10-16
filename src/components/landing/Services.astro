@@ -17,27 +17,22 @@ const points = [
 	{
 		title: t("websites.title"),
 		content: t("websites.content"),
-		image: websiteSvg,
 	},
 	{
 		title: t("apps.title"),
-		content: t("apps.content"),
-		image: mobileSvg,
+		content: t("apps.content")
 	},
 	{
 		title: t("uiux.title"),
-		content: t("uiux.content"),
-		image: designSvg,
+		content: t("uiux.content")
 	},
 	{
 		title: t("seo.title"),
-		content: t("seo.content"),
-		image: seoSvg,
+		content: t("seo.content")
 	},
 	{
 		title: t("advertising.title"),
-		content: t("advertising.content"),
-		image: advertisingSvg,
+		content: t("advertising.content")
 	},
 ];
 ---
@@ -49,14 +44,11 @@ const points = [
 			{points.map(() => <div class="indicator w-full grow bg-[#333333]" />)}
 		</div>
 		{
-			points.map(({ title, content, image }) => (
-				<div class="point flex h-screen w-full flex-col items-center justify-center gap-x-20 gap-y-12 p-16 pr-0 md:flex-row lg:gap-x-40">
-					<div class="hidden w-full max-w-48 lg:block">
-						<Fragment set:html={image} class="" />
-					</div>
-					<article class="flex flex-col gap-14">
-						<h3 class="faq font-display text-4xl uppercase md:text-5xl lg:text-6xl">{title}</h3>
-						<p class="max-w-2xl text-lg" set:html={content} />
+			points.map(({ title, content }) => (
+				<div class="point flex h-screen w-full items-center justify-center p-16">
+					<article class="flex flex-col gap-14 text-center items-center">
+						<h3 class="faq font-display text-5xl uppercase md:text-6xl lg:text-7xl text-center">{title}</h3>
+						<p class="max-w-3xl font-mono text-xl lg:text-2xl text-center" set:html={content} />
 					</article>
 				</div>
 			))
