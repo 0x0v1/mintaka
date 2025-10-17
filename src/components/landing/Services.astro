@@ -45,10 +45,10 @@ const points = [
 		</div>
 		{
 			points.map(({ title, content }) => (
-				<div class="point flex h-screen w-full items-center justify-center p-16">
-					<article class="flex flex-col gap-14 text-center items-center">
-						<h3 class="faq font-display text-5xl uppercase md:text-6xl lg:text-7xl text-center">{title}</h3>
-						<p class="max-w-3xl font-mono text-xl lg:text-2xl text-center" set:html={content} />
+				<div class="point flex h-screen w-full items-center justify-center p-4 sm:p-8 md:p-16">
+					<article class="flex flex-col gap-8 sm:gap-10 md:gap-14 text-center items-center">
+						<h3 class="faq font-display text-2xl sm:text-3xl md:text-5xl lg:text-6xl xl:text-7xl uppercase text-center">{title}</h3>
+						<p class="max-w-3xl font-mono text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-center" set:html={content} />
 					</article>
 				</div>
 			))
