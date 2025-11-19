@@ -34,7 +34,8 @@ const allProjects = (await getCollection("projects"))
 			{
 				allProjects.map((project, index) => (
 					<WokCard
-						image={project.data.image.source}
+						image={project.data.image?.source}
+						displayText={project.data.displayText}
 						project={project.data.title}
 						link={`/work/${project.slug}`}
 						class={

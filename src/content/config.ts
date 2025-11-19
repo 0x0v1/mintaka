@@ -33,7 +33,8 @@ const projectsCollection = defineCollection({
 			image: z.object({
 				source: image(),
 				alt: z.string(),
-			}),
+			}).optional(),
+			displayText: z.string().optional(),
 		}),
 });
 

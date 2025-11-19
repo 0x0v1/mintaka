@@ -56,7 +56,16 @@ const readingTime = getArticleReadingTime(body);
 				}
 			</div>
 			<div class="mt-12 w-full justify-center">
-				<Image class="mt-12 w-full rounded-lg object-cover" src={frontmatter.image.source} alt={frontmatter.image.alt} />
+				{frontmatter.image && (
+					<Image class="mt-12 w-full rounded-lg object-cover" src={frontmatter.image.source} alt={frontmatter.image.alt} />
+				)}
+				{!frontmatter.image && frontmatter.displayText && (
+					<div class="mt-12 w-full h-96 rounded-lg bg-zinc-900 flex items-center justify-center">
+						<span class="font-display text-6xl md:text-8xl font-bold text-white uppercase tracking-wider">
+							{frontmatter.displayText}
+						</span>
+					</div>
+				)}
 				<div class="flex justify-between px-2 pt-4 font-mono text-sm">
 					<div class="flex flex-wrap gap-1">
 						{frontmatter?.tags?.length > 0 && <span class="py-3">TAGS:</span>}
