@@ -1,0 +1,24 @@
+---
+import Title from "@components/global/Title.astro";
+import { getLangFromUrl, useTranslations } from "@i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<section>
+	<div class="mx-auto max-w-7xl px-8 py-12 md:px-12 lg:px-32 lg:py-32">
+		<div>
+			<Title title="BARGHEST" subtitle="{ BARG-HEST }" class="pb-10 pt-20 uppercase" />
+		</div>
+		<div class="prose-styles mt-12 lg:mt-24">
+			<h2>[ ABOUT ]</h2>
+			<p>We are a non-profit company limited by guarantee (CLG) registered in the United Kingdom. We work in and for civil society, with most of our programmes based in East and South Asia. For U.S.-based funders, we are treated as the equivalent of a 501(c)(3) organization for grantmaking purposes.</p>
+
+			<h2 class="mt-12">[ CONNECT ]</h2>
+			<p>If you are a collaborator, contributor, and partners who shares our vision. Whether you're a security researcher, developer, or organization working in the human rights space, we'd love to hear from you.</p>
+			<p>Contact us at <a href="mailto:info@barghest.asia" class="text-black hover:underline font-semibold">info@barghest.asia</a></p>
+		</div>
+	</div>
+</section>
+

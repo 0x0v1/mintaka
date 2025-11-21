@@ -1,0 +1,17 @@
+---
+import AboutPage from "@/components/infopages/About.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import type { AstroSeoProps } from "@astrolib/seo";
+
+const seo: AstroSeoProps = {
+	title: "About BARGHEST - Open-Source Security Research",
+	description:
+		"Learn about BARGHEST, a non-profit grassroots security research team building open-source tools to tackle spyware, malware, surveillance, and censorship.",
+	canonical: "https://barghest.asia/about/",
+};
+---
+
+<BaseLayout seo={seo}>
+	<AboutPage />
+</BaseLayout>
+
