@@ -13,7 +13,7 @@ export default defineConfig({
 			},
 		},
 	},
-	site: "https://mintaka.co",
+	site: "https://barghest.asia",
 	i18n: {
 		defaultLocale: "en",
 		locales: ["en", "cn"],

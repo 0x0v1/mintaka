@@ -24,7 +24,7 @@ export const ui = {
 		"hero.title.3": "Surveillance",
 		"hero.title.4": "Censorship",
 		"hero.subtitle":
-			"We are a non-profit, grassroots security research team. A collective of hacktivists, security researchers, technologists & incident responders working at the intersection of technology and human rights",
+			"We are a non-profit, grassroots security research team. We are hackers working at the intersection of technology and human rights.",
 		"hero.scroll": "scroll down to explore more",
 		"websites.title": "Democratizing threat intelligence",
 		"apps.title": "Open-source",
@@ -32,7 +32,7 @@ export const ui = {
 		"seo.title": "Decentralized",
 		"advertising.title": "Ubiquitous", 
 		"websites.content": "Our work fills critical gaps in spyware research, enabling localized, decentralized, and public-interest threat labs to emerge worldwide. Through open-source, community-driven tools and methodologies, we decolonize and democratize threat research.",
-		"apps.content": "All tools are built in-house and open-source, ensuring full technological sovereignty, transparency, and trust. Nothing is outsourced. Nothing is proprietary. Built for the people; by the people.",
+		"apps.content": "All tools are built in-house and open-source, ensuring full technological sovereignty, transparency, and trust. Nothing is outsourced. Nothing is proprietary.",
 		"uiux.content": "Our mission is to defend human rights defenders—particularly in East and Southeast Asia. We tackle technological problems affecting the majority world, specializing in Android threat research across Asia, Latin America, and Africa.",
 		"seo.content": "All technology is built for self-hosting and self-agency. We never create systems requiring centralization to us. We focus on building open-source technology and do not offer paid services.",
 		"advertising.content": "Our technologies serve the global majority, designed for all civic actors: NGOs, journalists, and community networks worldwide.",
