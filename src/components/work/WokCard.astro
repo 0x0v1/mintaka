@@ -12,10 +12,12 @@ const { image, displayText, project, link, description, class: className } = Ast
 <li class:list={["flex flex-col", className]}>
 	<a href={translatePath(link)} aria-label={`Project ${project}`}>
 		{image ? (
-			<Image class="h-[25rem] rounded-md object-cover lg:rounded-lg" src={image} alt={project} />
+			<div class="h-[25rem] rounded-md lg:rounded-lg flex items-center justify-center" style="background-color: rgb(0, 0, 0);">
+				<Image class="max-h-full max-w-full object-contain" src={image} alt={project} />
+			</div>
 		) : (
-			<div class="h-[25rem] rounded-md lg:rounded-lg bg-zinc-900 flex items-center justify-center px-8 md:px-12 lg:px-16">
-				<span class="font-display text-6xl md:text-8xl font-bold text-white uppercase tracking-wider">
+			<div class="h-[25rem] rounded-md lg:rounded-lg flex items-center justify-center px-8 md:px-12 lg:px-16" style="background-color: rgb(0, 0, 0);">
+				<span class="font-hack text-6xl md:text-8xl font-bold text-white uppercase tracking-wider">
 					{displayText || project}
 				</span>
 			</div>
