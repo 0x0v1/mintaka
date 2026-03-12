@@ -21,8 +21,10 @@
 }
 
 :root {
-	--astro-code-color-text: #ffffff;
-	--astro-code-color-background: #040404;
+	--astro-code-foreground: #ffffff;
+	--astro-code-background: #040404;
+	--astro-code-color-text: var(--astro-code-foreground);
+	--astro-code-color-background: var(--astro-code-background);
 	--astro-code-token-constant: #8b919b;
 	--astro-code-token-string: #ffffff;
 	--astro-code-token-comment: #8b919b;
@@ -104,7 +106,26 @@ html {
 }
 
 .prose-styles {
-	@apply prose mx-auto max-w-3xl text-slate-500 prose-headings:font-bold prose-headings:tracking-tighter prose-headings:text-black prose-a:text-slate-500 hover:prose-a:text-black prose-blockquote:border-l-slate-950 prose-blockquote:text-slate-500 prose-code:text-black prose-pre:rounded-lg prose-li:marker:text-slate-500;
+	@apply prose mx-auto max-w-3xl text-slate-500 prose-headings:font-bold prose-headings:tracking-tighter prose-headings:text-black prose-a:text-slate-500 hover:prose-a:text-black prose-blockquote:border-l-slate-950 prose-blockquote:text-slate-500 prose-code:text-black prose-pre:rounded-lg prose-pre:bg-zinc-950 prose-pre:text-slate-100 prose-pre:border prose-pre:border-zinc-800 prose-pre:px-5 prose-pre:py-4 prose-li:marker:text-slate-500;
+}
+
+.prose-styles pre {
+	background-color: var(--astro-code-background);
+	color: var(--astro-code-foreground);
+	overflow-x: auto;
+	box-shadow: 0 10px 30px rgba(4, 4, 4, 0.12);
+}
+
+.prose-styles pre code {
+	background: transparent;
+	color: inherit;
+	padding: 0;
+	border-radius: 0;
+	font-weight: 400;
+}
+
+.prose-styles :not(pre) > code {
+	@apply rounded bg-slate-200 px-1.5 py-0.5 text-sm text-slate-900;
 }
 
 .section {

@@ -1,0 +1,267 @@
+---
+pubDate: 2026-01-28
+author:
+    name: BARGHEST
+    link: /author/barghest
+title: "Mesh Network Cache Poisoning: Exploiting BitChat's BLE Authentication"
+description: "A security audit of BitChat identified a cache poisoning vulnerability that allows adversaries to inject unauthenticated messages into the mesh network."
+image:
+    source: "@assets/images/blog/bitchat-cache-poisoning.jpg"
+    alt: "Security vulnerability research - mesh network cache poisoning"
+tags: ["security", "vulnerability", "mesh-networking", "bluetooth", "mobile"]
+---
+
+## Introduction
+
+BARGHEST conducted a security audit of BitChat to identify vulnerabilities that an adversary could exploit to disrupt, DoS or degrade the effectiveness of the mesh network during active use. Relevant adversaries include malicious mesh participants or nearby Bluetooth attackers, particularly in environments where mesh messaging applications may be used during internet disruptions or shutdowns.
+
+As mesh messaging applications such as BitChat gain wider adoption, particularly in civic contexts, attempts to interfere with their operation are increasingly plausible. During the audit, we identified an exploit chain that results in a cache poisoning attack. This attack allows an adversary to inject unauthenticated messages into the mesh and have them redistributed during synchronization, enabling dos, spam, spoofed messages, or degradation of reliable message delivery across the Bluetooth mesh network. In practice, this could significantly undermine the effectiveness of an offline messaging application such as BitChat in scenarios where reliable peer-to-peer communication is required.
+
+Outside of this issue, the audit did not identify additional vulnerabilities that would materially affect the threat scenario considered in this assessment.
+
+## Acknowledgements
+
+We thank Jack and his team for coordinating the response and deploying a patch for the identified vulnerability on the same day. Their willingness to expedite remediation in light of the severity of the finding is commendable.
+
+This research was conducted by BARGHEST.
+
+## Context
+
+This post documents a cache poisoning vulnerability chain in BitChat, a decentralized peer-to-peer messaging application that uses Bluetooth Low Energy (BLE) mesh networking to provide offline communication in light of an internet shutdown. The issue affected BitChat iOS version 1.15.0 and was patched on January 28th 2026.
+
+BitChat operates without centralized infrastructure: peers discover each other opportunistically over BLE and relay messages across a gossip-style mesh. To support eventual consistency, nodes maintain a local cache of public messages and synchronize this cache with newly encountered peers. This behaviour is intentional and fundamental to the system's design.
+
+As a consequence, the message cache constitutes a critical trust boundary. Any packet admitted to the cache becomes eligible for redistribution to other peers during routine synchronization. Correctness therefore depends on a strict invariant: only packets that have passed all authentication and validity checks should be allowed to enter the cache.
+
+In gossip-based mesh networks, cache admission errors have consequences that differ qualitatively from those in centralized systems. Cached state is designed to be replayed, forwarded, and merged across peers during synchronization, so weaknesses in cache admission become mechanisms for persistence and amplification rather than transient validation failures. Here, a malformed or unauthenticated packet admitted to a single node's cache could propagate autonomously to other peers during routine synchronization. While this did not enable code execution, it enabled durable, self-propagating poisoning of shared network state, a property that is particularly significant in delay-tolerant and intermittently connected mesh deployments.
+
+The vulnerability described here arose from how this invariant was enforced in the iOS implementation. Specifically, the client could accept and persist packets that were unsigned or otherwise unauthenticated. Once such a packet was inserted into the local cache, it was treated as legitimate sync state and replayed to other peers during gossip synchronization, without further attacker involvement. The flaw was not that BitChat synchronized messages, but that unauthenticated input could cross the trust boundary into synchronized state.
+
+For clarity, this analysis focuses on MESSAGE packets. However, we observed the same acceptance-and-caching pattern in the file transfer path used for attachments (including voice notes), indicating that the issue was systemic rather than message-type specific.
+
+At the protocol level, BitChat uses Ed25519 signatures for message authentication and Curve25519 for key agreement, a design intent in which all messages are cryptographically attributable. The vulnerability did not stem from weak primitives, but from inconsistent enforcement in the client's packet validation and caching logic.
+
+After initial injection, a malicious packet would propagate to additional peers via normal mesh synchronization, triggering the same vulnerable code paths during sync processing.
+
+To explain how these behaviors combine into a practical cache poisoning attack, we begin by outlining the relevant aspects of the BitChat protocol.
+
+## BitChat protocol
+
+BitChat uses a custom binary protocol with a 14-byte header:
+
+![BitChat protocol header layout](/images/blog/bitchat-cache-poisoning-protocol.png)
+
+The flags byte encodes several properties:
+
+- Bit 0: hasRecipient
+- Bit 1: hasSignature
+- Bit 2: isCompressed
+- Bit 3: hasRoute
+- Bit 4: isRSR (Request-Sync Response)
+
+Following the header are the sender ID (8 bytes), optional recipient ID, variable-length payload, and optional 64-byte Ed25519 signature.
+
+The mesh uses a gossip protocol to synchronize cached public messages. When a new peer joins, it sends `REQUEST_SYNC` to neighbours, who respond with cached messages. The security boundary is what is allowed to become a cache entry.
+
+## The vulnerability chain
+
+Our findings exploit four distinct vulnerabilities in `bitchat/Services/BLE/BLEService.swift`:
+
+(a nearly identical chain also existed for `fileTransfer` packets, so the cache poisoning extends to attachments as well.)
+
+### Vuln 1: trusting packet-embedded identity
+
+The sender ID was extracted directly from the packet payload:
+
+```swift
+//2203-2204 bitchat/Services/BLE/BLEService.swift
+let senderID = PeerID(hexData: packet.senderID)
+if !validatePacket(packet, from: senderID) {
+    continue
+}
+```
+
+When the application was vulnerable, the `senderID` was attacker-controlled. There was no verification that it corresponds to the actual BLE connection source. Thus, an attacker could claim any peer identity.
+
+### Vuln 2: RSR window bypass
+
+When a node received an `ANNOUNCE` from a new peer, it scheduled a sync request, opening a 30-second "RSR window" for that peer. During this window, packets with the `isRSR` flag bypassed timestamp validation:
+
+```swift
+//1168-1174 bitchat/Services/BLE/BLEService.swift
+if isRSR || isLegacyRSR {
+    if requestSyncManager.isValidResponse(
+        from: peerID, isRSR: true
+    ) {
+        skipTimestampCheck = true
+    } else {
+        return false
+    }
+}
+```
+
+Combined with weakness 1, an attacker could set their sender ID to any peer for which an RSR window was open—including their own, since they just sent an `ANNOUNCE`.
+
+### Vuln 3: TTL=0 authentication bypass
+
+
+When signature verification failed but TTL equaled zero, the packet was accepted unconditionally. The apparent intent was to handle "local-only" messages, but nothing enforced that TTL=0 packets were actually local. An attacker could set TTL=0 on any packet to bypass authentication entirely.
+
+```swift
+//4063-4066 bitchat/Services/BLE/BLEService.swift
+if !accepted && packet.ttl == 0 {
+    accepted = true
+    senderNickname = "anon" + String(peerID.id.prefix(4))
+}
+```
+
+### Vuln 4: cache-before-reject
+
+Broadcast packets were added to the gossip cache *before* the final acceptance check. Even packets that would be rejected persist in the cache and will be redistributed during subsequent sync operations.
+
+```swift
+//4074-4081 bitchat/Services/BLE/BLEService.swift
+if isBroadcastRecipient && packet.type == MessageType.message.rawValue {
+    gossipSyncManager?.onPublicPacketSeen(packet)
+}
+guard accepted else { // Rejection check is AFTER caching
+    return
+}
+```
+
+## Exploitation
+
+The attack proceeded as follows:
+
+1. Attacker scans for BLE advertisements containing the BitChat service UUID
+2. Attacker connects to victim's GATT server
+3. Attacker sends a valid, signed `ANNOUNCE` packet with a fresh identity
+4. Victim's `onNewPeerDiscovered` handler schedules a sync, opening an RSR window
+5. After a brief delay, attacker sends the exploit packet:
+   - Type: MESSAGE (0x02)
+   - TTL: 0 (triggers authentication bypass)
+   - Flags: 0x10 (isRSR=true, hasSignature=false)
+   - Sender ID: attacker's peer ID
+   - Payload: arbitrary message
+   - No signature
+
+The victim would process this packet as follows:
+
+1. `validatePacket()` extracts sender ID from packet (attacker's ID)
+2. isRSR flag is set, RSR window is open → validation passes
+3. Signature check fails (no signature present)
+4. `accepted` is false after signature check
+5. TTL=0 → `accepted = true` via fallback
+6. `onPublicPacketSeen()` caches the packet
+7. Message displayed in chat
+
+<video controls width="100%" style="max-width: 800px; margin: 2rem auto; display: block;">
+  <source src="/videos/bitchat-demo.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
+
+## Cache poisoning and replay
+
+BitChat's sync protocol is explicitly designed to replay *cached* public packets to peers that request a sync. That behaviour is not, by itself, a vulnerability.
+
+The security boundary is the cache: in normal operation, only packets that pass validation (signature, freshness, etc.) become cache entries, and therefore only validated, attributable content is eligible for redistribution.
+
+This bug changed the *eligibility for replay* mechanism: an invalid/unsigned/spoofed packet could survive the validation chain, get cached, and then be treated as ordinary sync content.
+
+```python
+                                ┌───────────────┐
+                                │               │
+                                │    ATTACKER   │
+                                │               │
+                                └───────┬───────┘
+                                        │
+                                        │
+                                        ▼
+                             ┌──────────────────────┐
+                             │                      │
+                             │  NODE A (poison node)│
+                             │                      │
+                             └──────────┬───────────┘
+                                        │
+                ┌───────────────────────┼───────────────────────┐
+                │                       │                       │
+                ▼                       ▼                       ▼
+          ┌─────────┐            ┌─────────┐            ┌─────────┐
+          │ NODE B  │            │ NODE C  │            │ NODE D  │
+          └─────────┘            └────┬────┘            └─────────┘
+                                      │
+                                      │ sync protocol
+                            ┌─────────┴──────────┐
+                            ▼                    ▼
+                    ┌──────────┐          ┌──────────┐
+                    │  NODE E  │          │  NODE F  │
+                    └──────────┘          └──────────┘
+            (receive replayed entry via sync)   (receive replayed entry via sync)
+```
+
+Once any node cached the malicious packet, routine sync replayed it further without the attacker staying online:
+
+1. Peer C sends `REQUEST_SYNC` to victim
+2. Victim responds with cached packets, including the malicious one
+3. Victim sets TTL=0 and isRSR=true on sync response packets
+4. Peer C receives the packet, processes it through the same vulnerable chain
+5. Peer C caches the packet
+6. When Peer D syncs with Peer C, the cycle repeats
+
+Redistribution became automatic: poison one node's cache once, and normal protocol operation handled replay across the mesh.
+
+
+
+This was distinct from ordinary participation in an open mesh. An open mesh may allow any peer to send messages, but it still depends on two properties: the identity used for security decisions must be bound to the authenticated transport peer, and only validated packets should become replayable cache entries. The iOS implementation violated both. The sender identity used for RSR admission came from attacker-controlled packet data rather than the BLE peer, and the TTL=0 path allowed unsigned packets to enter the cache.
+
+Once cached, those packets acquired the distribution properties of legitimate gossip traffic. The result was not simply unsolicited content from an untrusted participant; it was cache poisoning with autonomous redistribution.
+
+## Android
+
+We examined the Android implementation and found it is not susceptible to this attack chain.
+
+Android enforces signature verification unconditionally. There is no TTL-based bypass path, no RSR mechanism that trusts packet-embedded identity, and caching occurs only after full validation.
+
+## Proof of concept
+
+We developed an [exploit proof-of-concept](https://github.com/BARGHEST-ngo/PoC_Bitchat1.15.0_iOS-BLEcache-poisoning). It performed the following steps:
+
+1. Scanned for BitChat BLE advertisements
+2. Connected to the target device
+3. Sent a crafted `ANNOUNCE` to trigger the RSR window
+4. Injected an unsigned `MESSAGE` with `TTL=0` and `isRSR=true`
+
+The minimal exploit packet was 39 bytes:
+
+```python {1-11}
+def craft_exploit(peer_id, payload):
+    data = bytearray()
+    data.append(0x01)       # version
+    data.append(0x02)       # type = MESSAGE
+    data.append(0x00)       # TTL = 0
+    data.extend(struct.pack('>Q', int(time.time() * 1000)))
+    data.append(0x10)       # flags = isRSR only
+    data.extend(struct.pack('>H', len(payload)))
+    data.extend(peer_id[:8])
+    data.extend(payload)
+    return bytes(data)
+```
+
+## Conclusion
+
+This issue illustrates how subtle validation and state-management decisions can undermine an otherwise sound cryptographic design. BitChat's protocol includes strong primitives for authentication and key agreement, but the iOS implementation failed to enforce them consistently at the point where packets transition from untrusted input into trusted, replayable state.
+
+The vulnerability was not the result of a single missing check, but of several weaknesses that interacted in unexpected ways: trusting packet-embedded identity, allowing conditional authentication bypasses, and caching packets before final acceptance. Together, these decisions allowed unauthenticated data to persist and propagate autonomously through the network.
+
+Mesh networks place unusual importance on cache integrity. Because cached state is explicitly designed to be replayed and shared, any weakness in cache admission logic becomes a mechanism for persistence and amplification. In this case, a single injected packet could spread to additional peers through routine background synchronization, without user interaction and without continued attacker presence.
+
+More broadly, this vulnerability highlights a class of issues in decentralized and gossip-based systems: cryptographic verification is only effective if it is enforced uniformly and unconditionally at all trust boundaries. Any fallback path that admits unauthenticated data—regardless of intent—must be treated as a security-critical decision, particularly when that data is eligible for redistribution.
+
+## Timeline
+
+- January 26th > Vulnerability identified
+- January 28th > Responsible disclosure to BitChat team
+- January 28th > PR raised (fix iOS BLE mesh authentication issues in BLEService#998)
+- January 28th > BitChat team implemented fix released to production
+- January 28th > Patched release published to Apple App Store
+

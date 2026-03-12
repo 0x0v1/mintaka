@@ -38,17 +38,20 @@ const points = [
 ---
 
 <section id="services" class:list={["section home-dark-section services-section relative", className]}>
-	<div class="wrapper col-span-12 h-screen w-full">
-		<h2 class="sr-only">{t("services")}</h2>
+	<div class="wrapper relative col-span-12 h-screen w-full">
+		<div class="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-center gap-4 pt-2 sm:pt-4">
+				<h2 class="font-mono text-xs uppercase tracking-[0.35em] opacity-50">////Principles</h2>
+			<div class="h-px flex-1 bg-current opacity-15"></div>
+		</div>
 		<div class="indicators absolute left-0 top-0 mt-[10vh] hidden h-[80vh] w-1 flex-col justify-between gap-2">
 			{points.map(() => <div class="indicator w-full grow bg-[#333333]" />)}
 		</div>
 		{
 			points.map(({ title, content }) => (
 				<div class="point flex h-screen w-full items-center justify-center p-4 sm:p-8 md:p-16">
-					<article class="flex flex-col gap-8 sm:gap-10 md:gap-14 text-center items-center">
-						<h3 class="faq font-display text-2xl sm:text-3xl md:text-5xl lg:text-6xl xl:text-7xl uppercase text-center">{title}</h3>
-						<p class="max-w-3xl font-mono text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-center" set:html={content} />
+					<article class="flex max-w-4xl flex-col items-center gap-6 text-center sm:gap-8 md:gap-10">
+						<h3 class="faq max-w-4xl font-display text-2xl uppercase leading-none text-center sm:text-3xl md:text-5xl lg:text-6xl xl:text-7xl">{title}</h3>
+						<p class="max-w-2xl font-mono text-sm leading-6 opacity-80 text-center sm:text-base md:text-lg md:leading-8 lg:text-xl xl:text-2xl" set:html={content} />
 					</article>
 				</div>
 			))

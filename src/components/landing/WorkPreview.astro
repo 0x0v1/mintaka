@@ -27,10 +27,13 @@ const allProjects = (await getCollection("projects"))
 	.sort((a, b) => Number(b.data.pubDate) - Number(a.data.pubDate));
 ---
 
-<section id="projects" class:list={["section work-preview-section home-dark-section py-12", className]}>
-	<div class="col-span-12 col-start-1 mx-auto max-w-7xl">
-		<h2 class="sr-only">{t("projects")}</h2>
-		<ol class="grid grid-cols-1 gap-24 md:grid-cols-2 lg:gap-44">
+<section id="projects" class:list={["section work-preview-section home-dark-section py-16 lg:py-20", className]}>
+	<div class="relative col-span-12 col-start-1 mx-auto max-w-7xl">
+			<div class="projects-label relative z-10 mb-10 flex items-center gap-4 lg:mb-14">
+				<h2 class="font-mono text-xs uppercase tracking-[0.35em] opacity-50">////{t("projects")}</h2>
+			<div class="h-px flex-1 bg-current opacity-15"></div>
+		</div>
+			<ol class="relative z-0 grid grid-cols-1 gap-20 md:grid-cols-2 lg:gap-36">
 			{
 				allProjects.map((project, index) => (
 					<WokCard
@@ -95,6 +98,18 @@ const allProjects = (await getCollection("projects"))
 		});
 
 		if (window.innerWidth >= 768) {
+				gsap.to(".work-preview-section .projects-label", {
+					scrollTrigger: {
+						trigger: ".work-preview-section ol",
+						start: "top bottom",
+						end: "bottom center",
+						scrub: 1,
+						markers: false,
+					},
+					ease: "none",
+					y: `-200px`,
+				});
+
 			projects.forEach((project) => {
 				gsap.to(project, {
 					scrollTrigger: {
