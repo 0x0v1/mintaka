@@ -47,6 +47,12 @@ const seo: AstroSeoProps = {
 		images: [ogImage],
 		site_name: "Barghest",
 	},
+	additionalMetaTags: [
+		{ name: "twitter:title", content: seoTitle },
+		{ name: "twitter:description", content: seoDescription },
+		{ name: "twitter:image", content: ogImage.url },
+		{ name: "twitter:image:alt", content: ogImage.alt },
+	],
 };
 ---
 

@@ -60,9 +60,20 @@ const defaultSeo: AstroSeoProps = {
 	],
 };
 
-const seo = {
+const seo: AstroSeoProps = {
 	...defaultSeo,
 	...seoProp,
+	openGraph: {
+		...defaultSeo.openGraph,
+		...seoProp?.openGraph,
+		images: seoProp?.openGraph?.images ?? defaultSeo.openGraph?.images,
+	},
+	twitter: {
+		...defaultSeo.twitter,
+		...seoProp?.twitter,
+	},
+	additionalMetaTags: [...(defaultSeo.additionalMetaTags ?? []), ...(seoProp?.additionalMetaTags ?? [])],
+	additionalLinkTags: [...(defaultSeo.additionalLinkTags ?? []), ...(seoProp?.additionalLinkTags ?? [])],
 };
 
 function cursorFollowerActive() {
