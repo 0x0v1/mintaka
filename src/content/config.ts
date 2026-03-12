@@ -4,10 +4,10 @@ const postsCollection = defineCollection({
 	schema: ({ image }) =>
 		z.object({
 			title: z.string(),
-				seoTitle: z.string().optional(),
+			seoTitle: z.string().optional(),
 			pubDate: z.date(),
 			description: z.string(),
-				seoDescription: z.string().optional(),
+			seoDescription: z.string().optional(),
 			author: z.object({
 				name: z.string(),
 				link: z.string(),
@@ -16,7 +16,7 @@ const postsCollection = defineCollection({
 				source: image(),
 				alt: z.string(),
 			}),
-				socialImage: z.string().optional(),
+			socialImage: z.string().optional(),
 
 			tags: z.array(z.string()),
 		}),
@@ -38,6 +38,7 @@ const projectsCollection = defineCollection({
 				alt: z.string(),
 			}).optional(),
 			displayText: z.string().optional(),
+				hideCardText: z.boolean().optional(),
 		}),
 });
 

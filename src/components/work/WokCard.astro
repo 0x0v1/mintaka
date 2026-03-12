@@ -6,7 +6,7 @@ const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 const translatePath = useTranslatedPath(lang);
 
-const { image, displayText, project, link, description, class: className } = Astro.props;
+const { image, displayText, hideCardText = false, project, link, description, class: className } = Astro.props;
 ---
 
 <li class:list={["flex flex-col", className]}>
@@ -15,7 +15,9 @@ const { image, displayText, project, link, description, class: className } = Ast
 			<div class="h-[25rem] rounded-md lg:rounded-lg flex items-center justify-center" style="background-color: rgb(0, 0, 0);">
 				<Image class="max-h-full max-w-full object-contain" src={image} alt={project} />
 			</div>
-		) : (
+			) : hideCardText ? (
+				<div class="h-[25rem] rounded-md lg:rounded-lg" style="background-color: rgb(0, 0, 0);"></div>
+			) : (
 			<div class="h-[25rem] rounded-md lg:rounded-lg flex items-center justify-center px-8 md:px-12 lg:px-16" style="background-color: rgb(0, 0, 0);">
 				<span class="font-hack text-6xl md:text-8xl font-bold text-white uppercase tracking-wider">
 					{displayText || project}
