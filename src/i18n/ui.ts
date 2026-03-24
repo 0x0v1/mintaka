@@ -15,7 +15,7 @@ export const ui = {
 		services: "Services",
 		homepage: "Homepage",
 		tagline:
-				"The private sector would make self-defense dependent on proprietary systems that hoard our data. We exist to break that dependency.",
+				"We work to democratize threat intelligence, threat research, and security research through open-source tools.",
 		"projects.yours": "Your project",
 		"projects.see": "See project",
 		"hero.title.main": "We build open-source software to tackle",
