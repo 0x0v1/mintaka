@@ -36,14 +36,16 @@ const readingTime = getArticleReadingTime(body);
 	<section>
 		<div class="mx-auto max-w-7xl px-8 py-12 md:px-12 lg:px-32 lg:py-32">
 			<div class="flex flex-col gap-6 pt-20">
-				{!frontmatter.image && !frontmatter.displayText && (
-					<Title
-						title={frontmatter.title}
-						subtitle={`Written by: <a href="${frontmatter.author.link}" rel="author">${frontmatter.author.name}</a> on ${frontmatter.pubDate
-							.toString()
-							.slice(0, 10)}`}
-					/>
-				)}
+				{
+					!frontmatter.image && !frontmatter.displayText && (
+						<Title
+							title={frontmatter.title}
+							subtitle={`Written by: <a href="${frontmatter.author.link}" rel="author">${frontmatter.author.name}</a> on ${frontmatter.pubDate
+								.toString()
+								.slice(0, 10)}`}
+						/>
+					)
+				}
 
 				<p class="max-w-2xl text-base text-slate-500">
 					<em>{frontmatter.description}</em>
@@ -58,16 +60,27 @@ const readingTime = getArticleReadingTime(body);
 				}
 			</div>
 			<div class="mt-12 w-full justify-center">
-				{frontmatter.image && (
-					<Image class="mt-12 w-full rounded-lg object-cover" src={frontmatter.image.source} alt={frontmatter.image.alt} />
-				)}
-				{!frontmatter.image && frontmatter.displayText && (
-					<div class="mt-12 w-full h-96 rounded-lg bg-zinc-900 flex items-center justify-center">
-						<span class="font-display text-6xl md:text-8xl font-bold text-white uppercase tracking-wider">
-							{frontmatter.displayText}
-						</span>
-					</div>
-				)}
+				{
+					frontmatter.image && frontmatter.transparentBg && (
+						<div class="mt-12 flex h-96 w-full items-center justify-center rounded-lg">
+							<Image class="max-h-full max-w-full object-contain" src={frontmatter.image.source} alt={frontmatter.image.alt} />
+						</div>
+					)
+				}
+				{
+					frontmatter.image && !frontmatter.transparentBg && (
+						<Image class="mt-12 w-full rounded-lg object-cover" src={frontmatter.image.source} alt={frontmatter.image.alt} />
+					)
+				}
+				{
+					!frontmatter.image && frontmatter.displayText && (
+						<div class="mt-12 flex h-96 w-full items-center justify-center rounded-lg bg-zinc-900">
+							<span class="font-display text-6xl font-bold uppercase tracking-wider text-white md:text-8xl">
+								{frontmatter.displayText}
+							</span>
+						</div>
+					)
+				}
 				<div class="flex justify-between px-2 pt-4 font-mono text-sm">
 					<div class="flex flex-wrap gap-1">
 						{frontmatter?.tags?.length > 0 && <span class="py-3">TAGS:</span>}

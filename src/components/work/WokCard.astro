@@ -20,9 +20,7 @@ const bgStyle = transparentBg ? "" : "background-color: rgb(0, 0, 0);";
 			) : hideCardText ? (
 				<div class="h-[25rem] rounded-md lg:rounded-lg" style={bgStyle} />
 			) : (
-				<div
-					class="flex h-[25rem] items-center justify-center rounded-md px-8 md:px-12 lg:rounded-lg lg:px-16"
-					style={bgStyle}>
+				<div class="flex h-[25rem] items-center justify-center rounded-md px-8 md:px-12 lg:rounded-lg lg:px-16" style={bgStyle}>
 					<span class="font-hack text-6xl font-bold uppercase tracking-wider text-white md:text-8xl">{displayText || project}</span>
 				</div>
 			)
