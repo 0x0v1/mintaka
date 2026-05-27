@@ -21,14 +21,14 @@ const translatePath = useTranslatedPath(lang);
 				</h1>
 			</div>
 			<div class="flex flex-col items-center gap-6 text-center lg:gap-7">
-				<p class="mt-2 max-w-2xl font-mono text-sm leading-6 opacity-70 sm:text-base md:text-lg md:leading-7">
+				<p class="mt-2 max-w-2xl text-base leading-8 text-zinc-400">
 					{t("hero.subtitle")}
 				</p>
 				<div class="flex flex-col items-center justify-center gap-4 lg:col-start-1">
 					<div class="flex flex-col items-center justify-center gap-3 sm:flex-row">
 						<div class="squircle-bg rounded-lg bg-zinc-900" data-cursor-hover data-cursor-parallax>
 							<a
-								class="flex h-10 w-full max-w-56 flex-1 items-center justify-center px-5 py-2 text-xl text-slate-200 transition-all hover:text-white sm:w-auto md:font-bold lg:h-10"
+								class="flex h-10 w-full max-w-56 flex-1 items-center justify-center px-5 py-2 text-xl font-bold uppercase text-slate-200 transition-all hover:text-white sm:w-auto lg:h-10"
 								aria-label="Escalation Page"
 								href={translatePath("/escalation/")}>
 								{t("escalate")}
@@ -36,7 +36,7 @@ const translatePath = useTranslatedPath(lang);
 						</div>
 						<div class="squircle-bg rounded-lg bg-zinc-900" data-cursor-hover data-cursor-parallax>
 							<a
-								class="flex h-10 w-full max-w-56 flex-1 items-center justify-center px-5 py-2 text-xl text-slate-200 transition-all hover:text-white sm:w-auto md:font-bold lg:h-10"
+								class="flex h-10 w-full max-w-56 flex-1 items-center justify-center px-5 py-2 text-xl font-bold uppercase text-slate-200 transition-all hover:text-white sm:w-auto lg:h-10"
 								aria-label="Contact Page"
 								href={translatePath("/contact/")}>
 								{t("contact")}
@@ -44,9 +44,11 @@ const translatePath = useTranslatedPath(lang);
 						</div>
 					</div>
 
-					<small class="font-mono text-[11px] uppercase tracking-[0.3em] opacity-60">
-						{t("or")}
-						<LinkBlend id="go-projects-button" isButton={true}>{t("hero.scroll")}</LinkBlend>
+					<small class="text-base font-bold uppercase leading-8 text-slate-200">
+						<span class="text-slate-300">{t("or")}</span>
+						<LinkBlend id="go-projects-button" class="font-bold uppercase text-slate-200" isButton={true}>
+							{t("hero.scroll")}
+						</LinkBlend>
 					</small>
 				</div>
 			</div>

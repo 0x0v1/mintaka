@@ -29,17 +29,17 @@ const allProjects = (await getCollection("projects"))
 
 <section id="projects" class:list={["section work-preview-section home-dark-section py-16 lg:py-20", className]}>
 	<div class="relative col-span-12 col-start-1 mx-auto max-w-7xl">
-			<div class="projects-label relative z-10 mb-10 flex items-center gap-4 lg:mb-14">
-				<h2 class="font-mono text-xs uppercase tracking-[0.35em] opacity-50">////{t("projects")}</h2>
+		<div class="projects-label relative z-10 mb-10 flex items-center gap-4 lg:mb-14">
+			<h2 class="text-base font-semibold uppercase leading-8 opacity-50">{t("projects")}</h2>
 			<div class="h-px flex-1 bg-current opacity-15"></div>
 		</div>
-			<ol class="relative z-0 grid grid-cols-1 gap-20 md:grid-cols-2 lg:gap-36">
+		<ol class="relative z-0 grid grid-cols-1 gap-20 md:grid-cols-2 md:gap-x-28 md:gap-y-24 lg:gap-x-44 lg:gap-y-36">
 			{
 				allProjects.map((project, index) => (
 					<WokCard
 						image={project.data.image?.source}
 						displayText={project.data.displayText}
-							hideCardText={project.data.hideCardText}
+						hideCardText={project.data.hideCardText}
 						transparentBg={project.data.transparentBg}
 						project={project.data.title}
 						link={`/work/${project.slug}`}
@@ -100,17 +100,17 @@ const allProjects = (await getCollection("projects"))
 		});
 
 		if (window.innerWidth >= 768) {
-				gsap.to(".work-preview-section .projects-label", {
-					scrollTrigger: {
-						trigger: ".work-preview-section ol",
-						start: "top bottom",
-						end: "bottom center",
-						scrub: 1,
-						markers: false,
-					},
-					ease: "none",
-					y: `-200px`,
-				});
+			gsap.to(".work-preview-section .projects-label", {
+				scrollTrigger: {
+					trigger: ".work-preview-section ol",
+					start: "top bottom",
+					end: "bottom center",
+					scrub: 1,
+					markers: false,
+				},
+				ease: "none",
+				y: `-200px`,
+			});
 
 			projects.forEach((project) => {
 				gsap.to(project, {
