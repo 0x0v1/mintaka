@@ -11,9 +11,10 @@ const { pathname } = Astro.url;
 
 type Props = {
 	seo?: AstroSeoProps;
+	bodyClass?: string;
 };
 
-const { seo: seoProp } = Astro.props;
+const { seo: seoProp, bodyClass } = Astro.props;
 
 const lang = getLangFromUrl(Astro.url);
 
@@ -114,7 +115,7 @@ Onward.
 		<BaseHead />
 		<AstroSeo {...seo} />
 	</head>
-	<body class="bg-slate-50">
+	<body class:list={["bg-slate-50", bodyClass]}>
 		<BackgroundTexture />
 		<Navigation />
 		{cursorFollowerActive() && <BlobCursorFollower />}

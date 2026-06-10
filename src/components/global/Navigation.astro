@@ -42,10 +42,15 @@ let pages = [
 // }
 
 const { pathname } = Astro.url;
+const isResearchPath = pathname.startsWith("/blog") || pathname.startsWith("/cn/blog");
 ---
 
 <header>
-	<a href={translatePath("/")} aria-label="Home" class="logo absolute z-50 flex h-[4.5rem] items-center md:h-[5.9rem]">
+	<a
+		href={translatePath("/")}
+		aria-label="Home"
+		data-logo-target="visible"
+		class:list={["logo absolute z-50 flex h-[4.5rem] items-center md:h-[5.9rem]", isResearchPath && "logo-hidden"]}>
 		<Image src={smallLogo} alt="BARGHEST Logo" class="logo-svg block h-auto w-56 md:w-72" />
 	</a>
 	<div data-xdata="{ open: false }" class="navigation fixed right-0 top-0 z-50" data-xbind.class="{'w-full navbar-open': open}">
@@ -54,7 +59,11 @@ const { pathname } = Astro.url;
 				<div
 					class="shadow-thick resizable nav-container squircle relative mx-auto flex w-full flex-col justify-center overflow-x-hidden bg-zinc-900 backdrop-blur-xl backdrop-filter md:flex-row-reverse">
 					<div class="flex flex-row items-center justify-end md:hidden">
-						<a class="px-3 py-[0.4rem] pl-4" href={translatePath("/contact/")} aria-label="Contact Page">
+						<a
+							class="px-3 py-[0.4rem] pl-4"
+							href={translatePath("/contact/")}
+							aria-label="Contact Page"
+							data-logo-target="visible">
 							<Icon class="text-white" name="octicon:mail-16" width="20" data-xbind.class="{'hidden': open}" />
 						</a>
 						<button
@@ -90,6 +99,7 @@ const { pathname } = Astro.url;
 									<li data-cursor-hover>
 										<a
 											href={translatePath(page.url)}
+											data-logo-target={page.url === "/blog/" ? "hidden" : "visible"}
 											class={`inline-block cursor-pointer px-1 py-[0.33rem] ${
 												page.url === pathname ||
 												page.url === pathname.replace(/^\/cn|\/$/, "") ||
@@ -133,6 +143,28 @@ const { pathname } = Astro.url;
 	}
 	.navigation.navbar-open {
 		mix-blend-mode: luminosity;
+	}
+	.logo {
+		opacity: 1;
+		visibility: visible;
+		transform: translateY(0);
+		transition:
+			opacity 420ms ease,
+			transform 420ms ease,
+			visibility 0ms linear 0ms;
+	}
+	.logo.logo-hidden {
+		opacity: 0;
+		visibility: hidden;
+		pointer-events: none;
+		transform: translateY(-0.5rem);
+		transition:
+			opacity 360ms ease,
+			transform 360ms ease,
+			visibility 0ms linear 360ms;
+	}
+	.logo.logo-no-transition {
+		transition: none;
 	}
 	.navigation,
 	.logo {
@@ -187,11 +219,58 @@ const { pathname } = Astro.url;
 	import { gsap } from "gsap";
 
 	function init() {
-		gsap.from(".logo-svg", {
-			autoAlpha: 0,
-			y: -8,
-			duration: 0.8,
-			ease: "power2.out",
+		const logo = document.querySelector<HTMLElement>("header .logo");
+		const isResearchPage = window.location.pathname.startsWith("/blog") || window.location.pathname.startsWith("/cn/blog");
+
+		if (logo && isResearchPage) {
+			logo.classList.add("logo-hidden");
+			sessionStorage.removeItem("barghestLogoFadeIn");
+		} else if (logo && sessionStorage.getItem("barghestLogoFadeIn") === "true") {
+			sessionStorage.removeItem("barghestLogoFadeIn");
+			logo.classList.add("logo-no-transition", "logo-hidden");
+			window.requestAnimationFrame(() => {
+				logo.classList.remove("logo-no-transition");
+				window.requestAnimationFrame(() => {
+					logo.classList.remove("logo-hidden");
+				});
+			});
+		} else if (logo) {
+			logo.classList.remove("logo-hidden", "logo-no-transition");
+		}
+
+		document.querySelectorAll<HTMLAnchorElement>("a[data-logo-target]").forEach((link) => {
+			function handleLogoTransition(event: MouseEvent) {
+				if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+					return;
+				}
+
+				const target = link.dataset.logoTarget;
+				const href = link.href;
+				const currentUrl = window.location.href.replace(/#.*$/, "");
+				const nextUrl = href.replace(/#.*$/, "");
+
+				if (!target || currentUrl === nextUrl) {
+					return;
+				}
+
+				event.preventDefault();
+
+				if (target === "hidden") {
+					sessionStorage.removeItem("barghestFooterLogoFadeIn");
+					logo?.classList.add("logo-hidden");
+					window.setTimeout(() => {
+						window.location.href = href;
+					}, 260);
+					return;
+				}
+
+				sessionStorage.setItem("barghestLogoFadeIn", "true");
+				sessionStorage.setItem("barghestFooterLogoFadeIn", "true");
+				window.location.href = href;
+			}
+
+			link.removeEventListener("click", handleLogoTransition);
+			link.addEventListener("click", handleLogoTransition);
 		});
 
 		let isHoveringMenu = false;

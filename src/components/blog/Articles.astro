@@ -1,12 +1,10 @@
 ---
 import { getCollection } from "astro:content";
 import Entry from "@/components/blog/Entry.astro";
-import Title from "@components/global/Title.astro";
-import { getLangFromUrl, useTranslations, useTranslatedPath } from "@i18n/utils";
+import { getLangFromUrl, useTranslations } from "@i18n/utils";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
-const translatePath = useTranslatedPath(lang);
 
 const allPosts = (await getCollection("posts"))
 	.filter((post) => {
@@ -24,7 +22,7 @@ const allPosts = (await getCollection("posts"))
 	.sort((a, b) => Number(b.data.pubDate) - Number(a.data.pubDate));
 ---
 
-<section>
+<section class="blog-index">
 	<div class="top-[-10rem]transform-gpu absolute inset-x-0 overflow-hidden blur-3xl sm:top-[-20rem]" aria-hidden="true">
 		<div class="gradient-element"></div>
 	</div>
@@ -35,7 +33,9 @@ const allPosts = (await getCollection("posts"))
 				<feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"></feTurbulence>
 			</filter>
 		</svg>
-		<Title title={t("blog.title")} subtitle={t("blog.subtitle")} class="pb-10 pt-20 uppercase" />
+		<div class="blog-kicker pt-20">
+			<p class="font-mono text-xs font-semibold uppercase text-slate-400">{t("blog.subtitle")}</p>
+		</div>
 		{
 			allPosts && allPosts[0] && (
 				<Entry

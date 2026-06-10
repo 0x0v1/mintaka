@@ -24,7 +24,7 @@
 					script.dataset.reactionsEnabled = '1';
 					script.dataset.emitMetadata = '0';
 					script.dataset.inputPosition = 'top';
-					script.dataset.theme = localStorage.theme == 'dark' ? 'dark' : 'light';
+					script.dataset.theme = document.body.classList.contains('blog-dark-page') || localStorage.theme == 'dark' ? 'dark' : 'light';
 					script.dataset.lang = 'en';
 					script.dataset.loading = 'lazy';
 					script.crossOrigin = 'anonymous';
