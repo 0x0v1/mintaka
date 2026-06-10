@@ -51,53 +51,43 @@ import Title from "@components/global/Title.astro";
 
 			<h2 class="mt-12">Choose your device</h2>
 
-			<div class="not-prose mt-8 grid gap-6 lg:grid-cols-2">
-				<article class="rounded-lg border border-slate-200 bg-white/70 p-6 shadow-sm">
-					<h3 class="font-display text-3xl">Android</h3>
-					<p class="mt-4 text-sm leading-6 text-slate-700">
-						Collect a full Android bug report. This creates a <code>.zip</code> file containing system logs, crash traces, process state, installed
-						app metadata, permissions, network summaries, and device configuration.
-					</p>
-					<ol class="mt-6 list-decimal space-y-3 pl-5 text-sm leading-6 text-slate-800">
-						<li>Open <strong>Settings</strong> → <strong>About phone</strong>.</li>
-						<li>Tap <strong>Build number</strong> 7 times to enable Developer Options.</li>
-						<li>Go to <strong>Settings</strong> → <strong>Developer Options</strong> → <strong>Take bug report</strong>.</li>
-						<li>Select <strong>Full report</strong>.</li>
-						<li>Wait for the report to complete. This may take several minutes.</li>
-						<li>Save the generated <code>bugreport.zip</code>.</li>
-						<li>Disable Developer Options after collection.</li>
-					</ol>
-					<p class="mt-6 text-sm leading-6 text-slate-700">
-						Advanced users may also collect the report with <code>adb bugreport</code> from a trusted computer.
-					</p>
-				</article>
+			<h3>Android</h3>
+			<p>
+				Collect a full Android bug report. This creates a <code>.zip</code> file containing system logs, crash traces, process state,
+				installed app metadata, permissions, network summaries, and device configuration.
+			</p>
+			<ol>
+				<li>Open <strong>Settings</strong> → <strong>About phone</strong>.</li>
+				<li>Tap <strong>Build number</strong> 7 times to enable Developer Options.</li>
+				<li>Go to <strong>Settings</strong> → <strong>Developer Options</strong> → <strong>Take bug report</strong>.</li>
+				<li>Select <strong>Full report</strong>.</li>
+				<li>Wait for the report to complete. This may take several minutes.</li>
+				<li>Save the generated <code>bugreport.zip</code>.</li>
+				<li>Disable Developer Options after collection.</li>
+			</ol>
+			<p>Advanced users may also collect the report with <code>adb bugreport</code> from a trusted computer.</p>
 
-				<article class="rounded-lg border border-slate-200 bg-white/70 p-6 shadow-sm">
-					<h3 class="font-display text-3xl">iOS</h3>
-					<p class="mt-4 text-sm leading-6 text-slate-700">
-						Collect an iOS sysdiagnose. This creates a diagnostic bundle containing system and application logs, crash reports, analytics
-						logs, networking state, and process/service metadata.
-					</p>
-					<ol class="mt-6 list-decimal space-y-3 pl-5 text-sm leading-6 text-slate-800">
-						<li>
-							Press <strong>Volume Up</strong>, <strong>Volume Down</strong>, and the <strong>Side button</strong> at the same time.
-						</li>
-						<li>Hold briefly, around 1 second, then release when you feel a vibration.</li>
-						<li>Wait 5-10 minutes. There may be no visible progress indicator.</li>
-						<li>Open the <strong>Files</strong> app.</li>
-						<li>
-							Check <strong>On My iPhone</strong> → <strong>Logs</strong>, <strong>CrashReporter</strong>, <strong>
-								DiagnosticLogs
-							</strong>, or <strong>Analytics Data</strong>.
-						</li>
-						<li>Find the newest file named like <code>sysdiagnose_YYYY.MM.DD_HH-MM-SS.tar.gz</code>.</li>
-						<li>
-							Compress the sysdiagnose file into a <code>.zip</code> before sending if your mail client or encryption workflow requires a
-							ZIP container.
-						</li>
-					</ol>
-				</article>
-			</div>
+			<h3>iOS</h3>
+			<p>
+				Collect an iOS sysdiagnose. This creates a diagnostic bundle containing system and application logs, crash reports, analytics logs,
+				networking state, and process/service metadata.
+			</p>
+			<ol>
+				<li>Press <strong>Volume Up</strong>, <strong>Volume Down</strong>, and the <strong>Side button</strong> at the same time.</li>
+				<li>Hold briefly, around 1 second, then release when you feel a vibration.</li>
+				<li>Wait 5-10 minutes. There may be no visible progress indicator.</li>
+				<li>Open the <strong>Files</strong> app.</li>
+				<li>
+					Check <strong>On My iPhone</strong> → <strong>Logs</strong>, <strong>CrashReporter</strong>, <strong>
+						DiagnosticLogs
+					</strong>, or <strong>Analytics Data</strong>.
+				</li>
+				<li>Find the newest file named like <code>sysdiagnose_YYYY.MM.DD_HH-MM-SS.tar.gz</code>.</li>
+				<li>
+					Compress the sysdiagnose file into a <code>.zip</code> before sending if your mail client or encryption workflow requires a ZIP
+					container.
+				</li>
+			</ol>
 
 			<h2 class="mt-12">Android Pixel intrusion logging</h2>
 			<p>
