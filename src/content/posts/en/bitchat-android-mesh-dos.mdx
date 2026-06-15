@@ -1,0 +1,237 @@
+---
+pubDate: 2026-05-19
+author:
+    name: BARGHEST
+    link: /author/barghest
+title: "Bitchat exploit: 0-click Bluetooth mesh DoS and topology based security research in internet freedom technologies"
+description: "A zero-click Bluetooth mesh DoS chain in BitChat Android."
+seoTitle: "BitChat Android Bluetooth mesh DoS vulnerability chain"
+seoDescription: "BARGHEST analysis of a BitChat Android zero-click Bluetooth mesh denial-of-service chain involving unauthenticated fragments, unbounded reassembly, and an integer overflow."
+image:
+    source: "@assets/images/blog/bitchat-android-mesh-dos.jpg"
+    alt: "Security vulnerability research - BitChat Bluetooth mesh DoS"
+tags: ["security", "vulnerability", "android", "bluetooth", "mesh-networking"]
+---
+
+# Bitchat exploit: 0-click Bluetooth mesh DoS and topology based security research in internet freedom technologies
+
+Image attribution: background image from ["Meshed Up Shadow"](https://www.flickr.com/photos/22979102@N04/24572427949) by [James P. Mann](https://www.flickr.com/photos/22979102@N04), licensed under [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/?ref=openverse). Digital art by [SHOCKHAM](https://shockham.com/).
+
+____
+
+As AI systems get better at finding conventional bugs, a useful question is what kinds of security research will still depend heavily on human judgment. Our view is that topology-based issues will be one of those areas: cases where security depends on reachability, peer selection, routing, trust propagation, fallback paths, and deployment shape, rather than on a single function or primitive.
+
+Peer-to-peer systems have had this problem for a long time. Sybil and eclipse attacks in Bitcoin and other distributed networks do not need to break cryptography directly; they work by changing what a victim can see. If an attacker controls enough of a node's neighborhood, they can influence the node's view of the network, so the failure mode is not always consensus failure in the narrow sense, but isolation.
+
+That is relevant beyond cryptocurrency. Internet freedom tools, peer-to-peer messaging systems, Bluetooth meshes, delay-tolerant networks, circumvention overlays, and federated social or relay networks all have places where topology becomes part of the security model. In those systems, adjacency can change capability, peer sets can shape truth, authenticated peers can still be malicious, and weak identity binding can become dangerous only after a later routing or sync operation.
+
+This post discloses a BitChat Android vulnerability chain we identified during an audit and uses it as a concrete example. During our audit of Bitchat, we found a zero-click Bluetooth mesh denial-of-service chain whose significance was not limited to a final integer overflow. The chain worked because unauthenticated packet admission, fragment reassembly, binary decoding, and flood relay were composed in a way that gave an adjacent attacker a path into a privileged parser. During our testing, LLMs were able to reason about individual primitives in isolation when given a substantial harness, but they did not identify the full vulnerability chain in context because the exploit depended on reachability across authentication, reassembly, decoding, and relay behavior. Finding that chain still required an experienced human reviewer who already understood the relevant system context. For this audit, that created a diminishing return: if a harness has to encode most of the researcher's theory before the model can find the chain, the immediate review may be better spent on the chain itself. That does not make the harness wasted work; it can still capture the theory in a reusable form, though a harness built around one implementation may be too specific to transfer directly to other systems.
+
+In our [previous post](/blog/bitchat-cache-poisoning/), we described a cache poisoning vulnerability chain in BitChat's iOS implementation and noted that Android was not affected by that specific issue. During the same audit, we found a separate Android chain that was more direct.
+
+An unauthenticated attacker within Bluetooth range could remotely crash a BitChat peer, and because FRAGMENT packets were eligible for mesh relay, the same attack could spread beyond the directly contacted device to other reachable peers that received a complete fragment set. That failure mode is especially relevant in shutdown environments where a state actor may try to suppress off-internet coordination. Iran is a recurring example of this threat model; Access Now reported that Iranian authorities [shut down the internet 34 times during protest crackdowns in 2023](https://www.accessnow.org/press-release/mena-keepiton-internet-shutdowns-2023-en/).
+
+The exploit demonstrated here required a commodity laptop with a Bluetooth adapter and about 18 seconds of airtime. Public remediation work for the affected paths is tracked in [permissionlesstech/bitchat-android#666](https://github.com/permissionlesstech/bitchat-android/pull/666).
+
+The chain had three parts:
+
+1. FRAGMENT packets bypassed signature verification.
+2. Fragment reassembly stored attacker-controlled data without meaningful size or count limits.
+3. The binary decoder used signed arithmetic for an unsigned payload length, causing an integer overflow and a 2 GB allocation request.
+
+Together, these vulnerabilities caused the decoder to request a 2 GB allocation from a reassembled packet of about 29 KB. The Android runtime raised an `OutOfMemoryError`, which the application's `Exception` handler did not catch, causing the app process to terminate. When malicious fragments continued to reach the device after restart, the app could be driven into a repeated crash loop while the attack continued.
+
+We tested the exploit against three physical Android devices simultaneously, and all three crashed within 18-20 seconds.
+
+This post assumes familiarity with the BitChat binary protocol: v1/v2 headers, message types, Ed25519 signatures, TTL-based flood relay, and the fragmentation format described in the previous post. The relevant detail here is that large messages are split into FRAGMENT (0x20) packets. Each fragment carries a 13-byte sub-header: 8-byte fragment ID, 2-byte index, 2-byte total count, 1-byte original type, followed by fragment data. Receivers store incoming fragments and, once all pieces arrive, concatenate the data and pass the result to the packet decoder. The v2 packet header uses a 4-byte unsigned payload length field, which becomes important in the third weakness.
+
+## Acknowledgements
+
+We thank Calle and Jack for coordinating the response and remediation work for the identified vulnerability.
+
+This research was conducted by BARGHEST.
+
+## Why topology matters here
+
+The attacker did not need to join a trusted conversation, complete a key exchange, compromise a peer, or persuade a user to interact with anything.
+
+The path:
+
+1. Android exposed a writable BLE GATT service without pairing.
+2. Fragment packets were accepted without signature verification.
+3. Fragment data was stored until the receiver believed the set was complete.
+4. The reassembled bytes were passed to the binary decoder.
+5. The decoder trusted an attacker-controlled length field enough to allocate from it.
+6. The relay layer treated unauthenticated FRAGMENT packets as relayable, while the reassembled inner packet was decoded before its own signature could be validated.
+
+Each individual component had a local purpose: BLE accepted nearby writes, fragmentation reassembled large messages, the decoder parsed packet headers, and the relay layer flooded packets across the mesh. The vulnerability was in the composition. Topology made the parser reachable from an unauthenticated nearby device, then made the same crash path reachable by other peers.
+
+This is not unique to BitChat as a design concern. Gossip and managed-flooding systems usually rely on propagation controls to keep local events from becoming network-wide events: [Bluetooth Mesh](https://www.bluetooth.com/blog/an-intro-to-bluetooth-mesh-part2/) uses TTL and message caches to limit relayed flooding; [Bridgefy](https://docs.bridgefy.me/sdk/ios/usage) exposes hop limits, TTL, sharing time, and maximum propagation controls; [libp2p Gossipsub](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.0.md) moved beyond naive FloodSub by bounding peer degree and amplification. The point is not that those systems share this vulnerability, but that in relay-heavy designs, parser placement and propagation budgets directly affect blast radius.
+
+This is the kind of issue that AI vulnerability systems may find difficult to identify reliably. A model might flag the integer overflow in the decoder, which is useful, but the security impact depends on reachability through the trust graph: who can send fragments, which packet types are authenticated, when relay happens, what gets reassembled locally, and where decoding occurs relative to authentication. That reasoning is spread across the system.
+
+## Vulnerability chain
+
+The exploit chained three vulnerabilities across three Android source files.
+
+### Vuln 1: Fragment packets bypassed signature verification
+
+In `SecurityManager.kt` (lines 238-247), the signature verification function only checked three message types:
+
+```kotlin
+// SecurityManager.kt
+private fun verifyPacketSignature(packet: BitchatPacket, peerID: String): Boolean {
+    try {
+        if (MessageType.fromValue(packet.type) !in setOf(
+                MessageType.ANNOUNCE,
+                MessageType.MESSAGE,
+                MessageType.FILE_TRANSFER
+            )) {
+            return true  // All other types bypass verification
+        }
+```
+
+FRAGMENT (0x20) was not in the set, so the function returned `true` for syntactically valid FRAGMENT packets without signature verification. That gave an unauthenticated attacker an entry point into the receiver's reassembly pipeline.
+
+On Android, the BitChat GATT service was writable without Bluetooth pairing, and the GATT characteristic accepted writes from nearby devices that connected to the service. In practice, there was no meaningful distinction between a mesh participant and an external device within Bluetooth range at this layer.
+
+This is a topology boundary issue because physical adjacency over BLE was enough to reach packet processing, while the FRAGMENT packet type was outside the signature requirement.
+
+### Vuln 2: Unbounded fragment reassembly
+
+In `FragmentManager.kt` (lines 176-199), incoming fragments were stored without validation on count or cumulative size:
+
+```kotlin
+// FragmentManager.kt
+if (!incomingFragments.containsKey(fragmentIDString)) {
+    incomingFragments[fragmentIDString] = mutableMapOf()
+    fragmentMetadata[fragmentIDString] = Triple(
+        fragmentPayload.originalType,
+        fragmentPayload.total,        // Attacker-controlled, up to 65535
+        System.currentTimeMillis()
+    )
+}
+
+incomingFragments[fragmentIDString]?.put(fragmentPayload.index, fragmentPayload.data)
+```
+
+The `total` field is a 2-byte unsigned integer decoded from the fragment header, which means it is attacker-controlled and can be as large as 65,535. There was no cap on fragments per fragment ID, no cap on cumulative stored data, and no per-connection rate limit; the only constraint was a 30-second cleanup timer that purged stale fragment sets.
+
+At observed BLE throughput, roughly 11 writes per second, an attacker could deliver about 200-330 fragments before cleanup ran, which was enough to complete a fragment set and trigger reassembly. Fragmentation is meant to be a transport mechanism, but in this case it became a way for an unauthenticated adjacent device to manufacture an inner packet that would be decoded after reassembly.
+
+### Vuln 3: integer overflow caused a bounds-check bypass in BinaryProtocol.decodeCore()
+
+The crash primitive was a bounds-check bypass in `BinaryProtocol.kt` (lines 361-473). The decoder read the payload length as an unsigned 32-bit integer but computed the expected packet size using signed 32-bit arithmetic:
+
+```kotlin
+// BinaryProtocol.kt - line 362
+val payloadLength = if (version >= 2u.toUByte()) {
+    buffer.getInt().toUInt()  // 4 bytes, unsigned - up to 4,294,967,295
+} else {
+    buffer.getShort().toUShort().toUInt()
+}
+
+// Line 369: expectedSize computed as SIGNED Int
+var expectedSize = headerSize + SENDER_ID_SIZE + payloadLength.toInt()
+```
+
+When `payloadLength` is `0x7FFFFFFF` (2,147,483,647), `.toInt()` produces `Int.MAX_VALUE`. Adding the header size (15) and sender ID size (8) overflows signed integer arithmetic:
+
+```
+15 + 8 + 2,147,483,647 = 2,147,483,670
+Int.MAX_VALUE           = 2,147,483,647
+Result (wrapped):        -2,147,483,626
+```
+
+The overflow made `expectedSize` negative, so the subsequent bounds check compared the actual buffer size, about 29 KB, against a negative value:
+
+```kotlin
+// Line 389
+if (raw.size < expectedSize) return null
+// 29000 < -2147483626 -> false -> check passes
+```
+
+Execution then reached the allocation:
+
+```kotlin
+// Line 446
+val payloadBytes = ByteArray(payloadLength.toInt())  // ByteArray(2,147,483,647)
+```
+
+That requested about 2 GB of contiguous heap memory, which fails reliably under normal Android heap limits and causes the runtime to throw `OutOfMemoryError`.
+
+The decoder's exception handler caught `Exception`:
+
+```kotlin
+// Line 470
+} catch (e: Exception) {
+    Log.e("BinaryProtocol", "Error decoding packet: ${e.message}")
+    return null
+}
+```
+
+Because `OutOfMemoryError` extends `Error`, not `Exception`, the catch block did not intercept it, allowing the error to propagate up the call stack until the Android runtime terminated the process.
+
+## Integer overflow details
+
+The integer bug is straightforward. Kotlin's `UInt` type is unsigned 32-bit, with range 0 to 4,294,967,295, while `Int` is signed 32-bit, with range -2,147,483,648 to 2,147,483,647. Converting `UInt` to `Int` with `.toInt()` does not perform a range check; it reinterprets the bit pattern.
+
+For `0x7FFFFFFF`, the conversion produces `Int.MAX_VALUE`. Adding any positive value to `Int.MAX_VALUE` overflows:
+
+```
+Int.MAX_VALUE + 1 = Int.MIN_VALUE  (-2,147,483,648)
+Int.MAX_VALUE + 23 = -2,147,483,626
+```
+
+The attacker chose `0x7FFFFFFF` because it remained positive after `.toInt()` while guaranteeing overflow when the 23 bytes of header and sender ID were added. Any value from `0x7FFFFFE9` to `0x7FFFFFFF` would have worked, because the minimum addition was 23 bytes.
+
+The bounds check was correct in intent, but it operated on the overflowed value. Since `expectedSize` was negative, a positive `raw.size` was not less than it, so the check passed and the decoder allocated `ByteArray(payloadLength.toInt())`.
+
+Android heap limits vary by device but are commonly in the 256-512 MB range, so a 2 GB allocation is enough to fail. Because the thrown type was `OutOfMemoryError`, not `Exception`, the local catch block did not handle it.
+
+This is the part of the chain that automated tools are most likely to identify: signed arithmetic, unchecked allocation, and exception handling that does not catch `Error`. The harder part is proving that an unauthenticated BLE neighbor can reach this decoder through fragment handling and relay behavior.
+
+## Gossip flood relays & amplification
+
+Gossip-based flood relay systems are intentionally built to spread messages through partial, changing connectivity. That property is what makes them useful during outages and internet shutdowns: a sender does not need a stable route to every recipient, only enough neighboring peers to keep the message moving.
+
+The same property makes validation order dangerous. If a node forwards, stores, or performs expensive work on a packet before the relevant trust checks and resource limits have run, the relay layer can turn a local input bug into a propagation bug. The failure mode is no longer just "one parser crashed"; it becomes "the network helps deliver the crashing input to more parsers."
+
+That is how wormable situations appear in mesh systems. The payload does not need to execute code or compromise the device in the classic sense. It only needs to be accepted, forwarded, and independently processed by each receiving node. When validation and trust binding are too late, and resource accounting is too weak, the protocol's propagation semantics become part of the exploit.
+
+In BitChat, FRAGMENT packets with TTL > 0 were eligible for relay, were accepted without signature verification, and were stored locally for reassembly. A direct recipient did not have to be the final target. TTL relay could fan fragments out to connected peers, and any peer that accumulated the complete 200-fragment set performed the expensive local work itself and reached the same decoder crash.
+
+This is why topology needs to be part of the threat model. A packet's blast radius is not only a property of the payload; it also depends on peer adjacency, relay policy, TTL, duplicate suppression, validation order, trust binding, and resource accounting. If invalid packets are cheap to propagate and expensive to reject, the network becomes an amplifier.
+
+## Why this may remain human research territory
+
+AI vulnerability systems will continue to improve at local bug finding, and they are already useful for taint-style reasoning. Topology chains are different because they require reasoning about:
+
+- discovery
+- adjacency
+- trust propagation
+- peer selection
+- relay and fallback paths
+- operator assumptions
+- real deployment topology
+- time and ordering
+
+The sequence matters: discovery happens first, some form of trust or eligibility is attached, and only later does a relay, fallback, sync, parser, or reassembly path activate. Each step can be ordinary on its own, while the issue appears only when the whole system is modeled.
+
+Eclipse attacks are a useful analogy because the bug is not simply that one line is wrong. The issue is that if an attacker controls enough of the victim's neighborhood, the attacker controls what the victim can observe, which is a graph property. AI systems can describe eclipse attacks, but the harder task is noticing that a specific implementation has recreated similar preconditions through peer discovery, routing, trust binding, and relay behavior.
+
+As AI commoditizes more local bug classes, this kind of work may become more valuable because the research target shifts from "find the bad line" to "prove the path through the trust graph."
+
+## Conclusion
+
+This vulnerability is a useful example of why protocol security cannot be reduced to cryptographic primitives or parser correctness in isolation. BitChat uses Ed25519 signatures and Noise Protocol encryption, which are meaningful primitives when applied consistently. In this chain, however, FRAGMENT packets bypassed signature verification, and the crash happened while decoding reassembled data before the inner packet's signature could matter, leaving the authentication boundary and crash boundary on opposite sides of the decoder.
+
+The integer overflow was a conventional signed/unsigned arithmetic bug that should be caught by review and static analysis, but the broader issue was reachability. An unauthenticated BLE neighbor could send fragments, the receiver would store and reassemble them, the decoder would allocate from an attacker-controlled length field, and the mesh could relay the same fragment stream to other nodes.
+
+For peer-to-peer systems, especially systems used in internet freedom contexts, that is the part worth emphasizing. Censorship and disruption do not always need to block content directly; they can target topology, including who can reach whom, which peers are trusted, what gets relayed, and where validation occurs.
+
+The same pattern is likely to matter across censorship-resistant and local-first communication systems. Peer discovery, relay selection, store-and-forward behavior, and trust binding all create places where topology shapes security, and those areas are likely to remain good targets for human-led research.
+
+Public remediation work for the vulnerability described in this post is tracked in [permissionlesstech/bitchat-android#666](https://github.com/permissionlesstech/bitchat-android/pull/666).
+
+If you are developing open-source internet freedom technologies and would like to discuss security pertaining to them, please [reach out](/contact/).
