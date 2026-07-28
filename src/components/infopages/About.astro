@@ -1,9 +1,5 @@
 ---
 import Title from "@components/global/Title.astro";
-import { getLangFromUrl, useTranslations } from "@i18n/utils";
-
-const lang = getLangFromUrl(Astro.url);
-const t = useTranslations(lang);
 ---
 
 <section>
@@ -13,20 +9,39 @@ const t = useTranslations(lang);
 		</div>
 		<div class="prose-styles mt-12 lg:mt-24">
 			<h2>ABOUT</h2>
-			<p>We are a non-profit company limited by guarantee (CLG) registered in the United Kingdom. We work in and for civil society, with most of our programmes based in East and South Asia. For U.S.-based funders, we have a valid Equivalency Determination by Latitude Global, and thus are treated as the equivalent of a 501(c)(3) organization for grantmaking purposes.</p>
-			<p>BARGHEST is a security research team of hackers working to protect human rights defenders and journalists exposed to advanced mobile surveillance, targeted malware, and state-backed digital repression—particularly across East and South East Asia.</p>
-            <p>Technically, BARGHEST conducts hands-on security research, reverse engineering, and vulnerability discovery. We hunt and analyze zero-day exploits, novel surveillance capabilities, and emerging attack chains used against civil society, and we translate that research into actionable, defensible knowledge that non-specialists can use. This includes building and maintaining open, decentralized forensic systems that support self-service triage, travel integrity checks, and remote evidence collection—designed to function under real-world constraints.</p>
-			<p>Our tools turn advanced hacking and threat-hunting techniques into guided workflows that frontline actors can safely operate themselves. We prioritize local control, evidentiary integrity, consent, and redaction, enabling communities to investigate attacks, preserve proof, and respond without surrendering sensitive data to commercial vendors or distant experts.</p>
-			<p>Programmatically, we work with regional partners, helplines, and labs to embed these capabilities into everyday security practice. We develop operational playbooks, train local operators, and support decentralized deployments that communities own, adapt, and defend. We design for resilience, not dependency.</p>
-			<p>BARGHEST is deliberately an anti-pattern. We do not build closed platforms, vendor-locked tooling, or expert-only forensic systems. We reject extractive security models and the assumption that digital forensics should sit exclusively with commercial vendors, governments, or distant specialists.</p>
-			<p>We approach security research with curiosity and an adversarial mindset. We take systems apart to understand how they are used against civil society, and we turn that knowledge into tools and workflows others can actually use.</p>
-			<p>Our team combines deep experience in hacking, zero-day research, reverse engineering, and nation-state threat analysis with long-standing work in human rights, digital protection, and governance. Across all of our work, our mission is to shift forensic power away from closed commercial vendors and centralized authorities, and toward the communities most affected by digital attacks—strengthening their autonomy, resilience, and ability to document, resist, and survive digital repression.</p>
+			<p>
+				We are a non-profit company limited by guarantee (CLG) registered in the United Kingdom. We work in and for civil society, with most
+				of our programmes based in East and South Asia. For U.S.-based funders, we have a valid Equivalency Determination by Latitude Global,
+				and thus are treated as the equivalent of a 501(c)(3) organization for grantmaking purposes.
+			</p>
+			<p>
+				BARGHEST is a security research team of hackers. We investigate mobile surveillance, targeted malware, and vulnerabilities that put
+				human rights defenders and journalists at risk, particularly in East and South East Asia.
+			</p>
+			<p>
+				Offensive security research informs what we build. We conduct penetration testing, vulnerability analysis, and reverse engineering.
+				This gives our research and development work a full cycle: we study how spyware and other threats work, then use those findings to
+				build a forensic commons for spyware investigations.
+			</p>
+			<p>
+				Our findings also shape our open-source forensic tools. WARD helps people collect and review evidence from Android devices. MESH is
+				being built for consent-based remote evidence collection when an investigator cannot reach the device in person.
+			</p>
+			<p>
+				Our tools are built entirely in house by our own team, which includes some of the best software engineers in the industry. We never
+				outsource development or subgrant it to another organization.
+			</p>
+			<p>
+				Sensitive evidence should not have to pass through a commercial vendor or a distant specialist before a community can act on it. Our
+				tools are designed around consent, local control, careful handling of evidence, and redaction. Expert review still matters, but it
+				should not be the only way to begin an investigation.
+			</p>
 			<h2 class="mt-12">CONNECT</h2>
-			<p>If you are a collaborator, contributor, and partners who shares our vision. Whether you're a security researcher, developer, or organization working in the human rights space, we'd love to hear from you.</p>
-			<p>Contact us at <a href="mailto:info@barghest.asia" class="text-black hover:underline font-semibold">info@barghest.asia</a></p>
+			<p>We welcome collaboration with security researchers, developers, human rights groups, helplines, and forensic labs.</p>
+			<p>Write to <a href="mailto:info@barghest.asia" class="font-semibold text-black hover:underline">info@barghest.asia</a>.</p>
 			<h2 class="mt-12">DONATE</h2>
-			<p>If we have contributed to the security of your product or being and wish to support our work financially:</p>
-			<p>Our BTC address is: bc1qsfrk6nqg0fm7ewxe3cwyztw53lpfw6dm7daxzk</p>
+			<p>If our work has helped you or improved the security of your product, you can support our research with Bitcoin.</p>
+			<p class="break-all">BTC: <code>bc1qsfrk6nqg0fm7ewxe3cwyztw53lpfw6dm7daxzk</code></p>
 		</div>
 	</div>
 </section>

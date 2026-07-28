@@ -24,7 +24,7 @@ export const ui = {
 		"hero.title.3": "Surveillance",
 		"hero.title.4": "Censorship",
 		"hero.subtitle":
-			"We are a non-profit group of public interest technologists working within and for civil society. We conduct security research and development, build open tools, and support public-interest defense against spyware, malware, and digital repression. ",
+			"We are a non-profit group of public interest technologists working within and for civil society. We're a hacker collective working on research and development, open tools, and public-interest defense against spyware, malware, and digital repression.",
 		"hero.scroll": "see our work",
 		"principles.publicInterest.title": "Public-interest research and development",
 		"principles.publicInterest.content":

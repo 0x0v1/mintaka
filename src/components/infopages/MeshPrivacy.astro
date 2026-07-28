@@ -5,13 +5,18 @@ import Title from "@components/global/Title.astro";
 <section>
 	<div class="mx-auto max-w-7xl px-8 py-12 md:px-12 lg:px-32 lg:py-32">
 		<div>
-			<Title title="Privacy Policy" subtitle="Mesh — Last updated April 2026" class="pb-10 pt-20" subtitleClass="" />
+			<Title title="Privacy Policy" subtitle="Mesh | Last updated April 2026" class="pb-10 pt-20" subtitleClass="" />
 		</div>
 		<div class="prose-styles mt-12 lg:mt-24">
-
 			<h2>1. Overview</h2>
-			<p>Mesh is an open-source mobile forensics and secure networking tool developed by Barghest. It enables encrypted peer-to-peer communication between devices for purposes such as remote debugging, forensic data collection, and network analysis.</p>
-			<p>This privacy policy explains what data is processed, how it is handled, and the responsibilities of users deploying and operating Mesh.</p>
+			<p>
+				Mesh is an open-source mobile forensics and secure networking tool developed by Barghest. It enables encrypted peer-to-peer
+				communication between devices for purposes such as remote debugging, forensic data collection, and network analysis.
+			</p>
+			<p>
+				This privacy policy explains what data is processed, how it is handled, and the responsibilities of users deploying and operating
+				Mesh.
+			</p>
 
 			<h2 class="mt-12">2. Key principles</h2>
 			<ul>
@@ -69,12 +74,21 @@ import Title from "@components/global/Title.astro";
 			<h2 class="mt-12">6. Relay infrastructure (DERP relays)</h2>
 			<p>When direct peer-to-peer connections cannot be established, Mesh uses relay servers ("DERP relays") to facilitate communication.</p>
 			<ul>
-				<li>By default, if a control plane operator has not configured their own relay infrastructure, Mesh may use relay servers provided by third parties</li>
+				<li>
+					By default, if a control plane operator has not configured their own relay infrastructure, Mesh may use relay servers provided by
+					third parties
+				</li>
 				<li>Relays forward encrypted traffic between peers and do <strong>not</strong> have access to plaintext content</li>
-				<li>Relay operators may process limited connection metadata (such as IP addresses, connection timing, and routing information) necessary to operate the service</li>
+				<li>
+					Relay operators may process limited connection metadata (such as IP addresses, connection timing, and routing information)
+					necessary to operate the service
+				</li>
 				<li>Control plane operators may configure and operate their own relay infrastructure instead of using third-party relays</li>
 			</ul>
-			<p><strong>Important:</strong> Use of third-party relay infrastructure may expose connection metadata to the relay operator. Users operating in sensitive environments should consider deploying their own relay infrastructure.</p>
+			<p>
+				<strong>Important:</strong> Use of third-party relay infrastructure may expose connection metadata to the relay operator. Users operating
+				in sensitive environments should consider deploying their own relay infrastructure.
+			</p>
 
 			<h2 class="mt-12">7. Control plane &amp; self-hosting</h2>
 			<p>Mesh includes a control plane component which is typically self-hosted by the operator.</p>
@@ -84,7 +98,10 @@ import Title from "@components/global/Title.astro";
 				<li>Authentication data (e.g. device enrollment, API keys)</li>
 				<li>Network topology and policy information</li>
 			</ul>
-			<p><strong>Responsibility:</strong> The operator of a control plane deployment acts as the <strong>data controller</strong> (or processor, depending on context) for any personal data handled within that deployment.</p>
+			<p>
+				<strong>Responsibility:</strong> The operator of a control plane deployment acts as the <strong>data controller</strong> (or processor,
+				depending on context) for any personal data handled within that deployment.
+			</p>
 			<p>Barghest does not operate a default hosted control plane.</p>
 
 			<h2 class="mt-12">8. User responsibilities</h2>
@@ -142,8 +159,12 @@ import Title from "@components/global/Title.astro";
 
 			<h2 class="mt-12">14. Contact</h2>
 			<ul>
-				<li>GitHub: <a href="https://github.com/BARGHEST-ngo/MESH" target="_blank" class="text-black hover:underline font-semibold">github.com/BARGHEST-ngo/MESH</a></li>
-				<li>Website: <a href="https://barghest.asia" class="text-black hover:underline font-semibold">barghest.asia</a></li>
+				<li>
+					GitHub: <a href="https://github.com/BARGHEST-ngo/MESH" target="_blank" class="font-semibold text-black hover:underline">
+						github.com/BARGHEST-ngo/MESH
+					</a>
+				</li>
+				<li>Website: <a href="https://barghest.asia" class="font-semibold text-black hover:underline">barghest.asia</a></li>
 			</ul>
 
 			<h2 class="mt-12">15. Summary</h2>
@@ -154,7 +175,6 @@ import Title from "@components/global/Title.astro";
 				<li>Relay infrastructure may process limited metadata</li>
 				<li>Operators are responsible for lawful and secure use</li>
 			</ul>
-
 		</div>
 	</div>
 </section>
