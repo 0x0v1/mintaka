@@ -46,6 +46,13 @@
 	}
 }
 
+@media (max-width: 539px) {
+	:root {
+		--grid-gap: 1rem;
+		--base-padding-x: 1rem;
+	}
+}
+
 html {
 	scrollbar-gutter: stable;
 	@apply overflow-x-hidden bg-slate-100;
