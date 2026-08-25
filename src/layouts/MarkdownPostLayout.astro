@@ -15,9 +15,10 @@ type Props = {
 	frontmatter: any;
 	body: string;
 	seo?: AstroSeoProps;
+	structuredData?: Record<string, unknown>;
 };
 
-const { frontmatter, body, seo } = Astro.props;
+const { frontmatter, body, seo, structuredData } = Astro.props;
 
 function getArticleReadingTime(body: string): number {
 	if (!body) return 0;
@@ -33,7 +34,7 @@ const isBlogPost = Array.isArray(frontmatter.tags);
 const publishedDate = frontmatter.pubDate instanceof Date ? frontmatter.pubDate.toISOString().slice(0, 10) : frontmatter.pubDate.toString().slice(0, 10);
 ---
 
-<BaseLayout seo={seo} bodyClass={isBlogPost ? "blog-dark-page" : undefined}>
+<BaseLayout seo={seo} structuredData={structuredData} bodyClass={isBlogPost ? "blog-dark-page" : undefined}>
 	{
 		isBlogPost ? (
 			<section class="blog-post">

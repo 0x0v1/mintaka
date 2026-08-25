@@ -54,8 +54,31 @@ const seo: AstroSeoProps = {
 		{ name: "twitter:image:alt", content: ogImage.alt },
 	],
 };
+
+const articleStructuredData = {
+	"@context": "https://schema.org",
+	"@type": "Article",
+	headline: seoTitle,
+	description: seoDescription,
+	image: ogImage.url,
+	datePublished: entry.data.pubDate.toISOString(),
+	dateModified: entry.data.pubDate.toISOString(),
+	mainEntityOfPage: canonical,
+	author: {
+		"@type": "Organization",
+		name: entry.data.author.name,
+	},
+	publisher: {
+		"@type": "Organization",
+		name: "BARGHEST",
+		logo: {
+			"@type": "ImageObject",
+			url: new URL("/images/meta/barghest_share.png", site).toString(),
+		},
+	},
+};
 ---
 
-<MarkdownPostLayout frontmatter={entry.data} body={entry.body} seo={seo}>
+<MarkdownPostLayout frontmatter={entry.data} body={entry.body} seo={seo} structuredData={articleStructuredData}>
 	<Content />
 </MarkdownPostLayout>

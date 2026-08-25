@@ -33,7 +33,12 @@ export default defineConfig({
 		tailwind({
 			applyBaseStyles: false,
 		}),
-		sitemap(),
+		sitemap({
+			filter: (page) => {
+				const pathname = new URL(page).pathname;
+				return !pathname.startsWith("/cn/") && !["/404/", "/thank-you/"].includes(pathname);
+			},
+		}),
 		mdx(),
 		icon(),
 	],

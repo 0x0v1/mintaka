@@ -12,38 +12,51 @@ const { pathname } = Astro.url;
 type Props = {
 	seo?: AstroSeoProps;
 	bodyClass?: string;
+	structuredData?: Record<string, unknown> | Array<Record<string, unknown>>;
 };
 
-const { seo: seoProp, bodyClass } = Astro.props;
+const { seo: seoProp, bodyClass, structuredData: pageStructuredData } = Astro.props;
 
 const lang = getLangFromUrl(Astro.url);
 
 const shareImage = new URL("/images/meta/barghest_share.png", Astro.site).toString();
+const canonical = new URL(Astro.url.pathname, Astro.site).toString();
+
+const structuredData = {
+	"@context": "https://schema.org",
+	"@graph": [
+		{
+			"@type": "ResearchOrganization",
+			name: "BARGHEST",
+			url: "https://barghest.asia/",
+			logo: shareImage,
+			sameAs: ["https://github.com/BARGHEST-ngo", "https://x.com/barghestasia", "https://infosec.exchange/@barghest"],
+		},
+		{
+			"@type": "WebSite",
+			name: "BARGHEST",
+			url: "https://barghest.asia/",
+		},
+	],
+};
 
 const defaultSeo: AstroSeoProps = {
-	title: "BARGHEST",
+	title: "BARGHEST | Open-source forensic tools for civil society",
 	description:
-		"Democratizing threat intelligence",
+		"BARGHEST researches software exploitation and builds open-source mobile forensic tools for civil society.",
 	canonical: "https://barghest.asia",
 	openGraph: {
 		url: "https://barghest.asia",
 		title: "Barghest Research Group",
 		description:
-			"Democratizing threat intelligence",
+			"BARGHEST researches software exploitation and builds open-source mobile forensic tools for civil society.",
 		images: [
 			{
 				url: shareImage,
-				width: 1200,
-				height: 630,
+				width: 1024,
+				height: 1024,
 				alt: "Social open graph",
-				type: "image/gif",
-			},
-			{
-				url: shareImage,
-				width: 4096,
-				height: 4096,
-				alt: "Twitter open graph",
-				type: "image/gif",
+				type: "image/png",
 			},
 		],
 		site_name: "Barghest",
@@ -61,12 +74,22 @@ const defaultSeo: AstroSeoProps = {
 	],
 };
 
+const title = seoProp?.title ?? defaultSeo.title;
+const description = seoProp?.description ?? defaultSeo.description;
+
 const seo: AstroSeoProps = {
 	...defaultSeo,
 	...seoProp,
+	title,
+	description,
+	canonical,
+	noindex: lang === "cn" || seoProp?.noindex,
 	openGraph: {
 		...defaultSeo.openGraph,
 		...seoProp?.openGraph,
+		url: canonical,
+		title: seoProp?.openGraph?.title ?? title,
+		description: seoProp?.openGraph?.description ?? description,
 		images: seoProp?.openGraph?.images ?? defaultSeo.openGraph?.images,
 	},
 	twitter: {
@@ -114,6 +137,8 @@ Onward.
 	<head>
 		<BaseHead />
 		<AstroSeo {...seo} />
+		<script type="application/ld+json" set:html={JSON.stringify(structuredData)}></script>
+		{pageStructuredData && <script type="application/ld+json" set:html={JSON.stringify(pageStructuredData)}></script>}
 	</head>
 	<body class:list={["bg-slate-50", bodyClass]}>
 		<BackgroundTexture />

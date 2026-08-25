@@ -5,13 +5,10 @@ import Authors from "@components/blog/Authors.astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
 
 const allAuthors = await getCollection("authors");
-const pageTitle = "Tag Index";
 
 const seo: AstroSeoProps = {
-	title: "Meet our team",
-	description:
-		"Meet our team",
-	canonical: "https://barghest.asia/author/",
+	title: "Authors | BARGHEST",
+	description: "People behind BARGHEST security research and open-source forensic tools.",
 };
 ---
 
